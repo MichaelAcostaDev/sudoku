@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#F7F8FA" />
+    <title>Sudoku Studio</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div id="confettiLayer" class="confetti-layer" aria-hidden="true"></div>
+    <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-block">
+          <p class="eyebrow">Juego de lógica premium</p>
+          <h1>Sudoku Studio</h1>
+        </div>
+        <div class="header-actions">
+          <label class="difficulty-select" for="difficultySelect">
+            <span>Dificultad</span>
+            <select id="difficultySelect">
+              <option value="easy">Fácil</option>
+              <option value="medium">Medio</option>
+              <option value="hard">Difícil</option>
+              <option value="extreme">Extremo</option>
+            </select>
+          </label>
+          <button id="tutorialBtn" class="action-btn">Tutorial</button>
+          <button id="newGameBtn" class="action-btn primary">Nueva partida</button>
+          <button id="pauseBtn" class="action-btn">Pausa</button>
+        </div>
+      </header>
+
+      <section class="status-bar" aria-label="Estado del juego">
+        <article class="stat-card">
+          <span class="label">Tiempo</span>
+          <strong id="timer">00:00</strong>
+        </article>
+        <article class="stat-card">
+          <span class="label">Errores</span>
+          <strong id="errors">0 / 5</strong>
+        </article>
+        <article class="stat-card">
+          <span class="label">Pistas</span>
+          <strong id="hints">3 / 3</strong>
+        </article>
+        <article class="stat-card">
+          <span class="label">Puntuación</span>
+          <strong id="score">1000</strong>
+        </article>
+      </section>
+
+      <main class="game-layout">
+        <section class="board-section">
+          <div class="board-shell">
+            <div class="board-wrapper" id="boardWrapper">
+              <div id="board" class="sudoku-board" role="grid" aria-label="Tablero de Sudoku"></div>
+            </div>
+
+            <div class="controls-panel">
+              <div class="game-meta">
+                <span class="meta-pill">Dificultad: <strong id="currentDifficulty">Fácil</strong></span>
+                <span class="meta-pill">Modo: <strong id="modeLabel">Normal</strong></span>
+              </div>
+              <div class="num-pad" id="numPad" aria-label="Teclado numérico"></div>
+              <div class="pad-actions">
+                <button id="pencilBtn" class="action-btn pill">✎ Lápiz</button>
+                <button id="undoBtn" class="action-btn pill">↶ Deshacer</button>
+                <button id="hintBtn" class="action-btn pill">💡 Pista</button>
+                <button id="restartBtn" class="action-btn pill">↻ Reiniciar</button>
+              </div>
+              <div class="mobile-keypad" id="mobileKeypad" aria-label="Teclado táctil"></div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="overlay hidden" id="pauseOverlay" aria-live="polite">
+      <div class="overlay-card pause-card">
+        <p class="eyebrow">Pausa</p>
+        <h2>Juego pausado</h2>
+        <div class="pause-stats">
+          <div><span>Tiempo</span><strong id="pauseTime">00:00</strong></div>
+          <div><span>Dificultad</span><strong id="pauseDifficulty">Fácil</strong></div>
+          <div><span>Errores</span><strong id="pauseErrors">0 / 5</strong></div>
+          <div><span>Puntuación</span><strong id="pauseScore">1000</strong></div>
+        </div>
+        <div class="overlay-actions">
+          <button id="resumeBtn" class="action-btn primary">Continuar</button>
+          <button id="pauseRestartBtn" class="action-btn">Reiniciar</button>
+          <button id="pauseNewGameBtn" class="action-btn">Nueva partida</button>
+          <button id="pauseExitBtn" class="action-btn">Salir</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay hidden" id="tutorialOverlay" aria-live="polite">
+      <div class="overlay-card tutorial-card">
+        <div class="tutorial-header">
+          <p class="eyebrow">Tutorial guiado</p>
+          <div class="progress-dots" id="progressDots"></div>
+        </div>
+        <div class="tutorial-content">
+          <h2 id="tutorialTitle">¿Qué es Sudoku?</h2>
+          <p id="tutorialText"></p>
+          <div class="tutorial-demo" id="tutorialDemo"></div>
+        </div>
+        <div class="overlay-actions tutorial-actions">
+          <button id="tutorialPrev" class="action-btn">Anterior</button>
+          <button id="tutorialNext" class="action-btn primary">Siguiente</button>
+          <button id="tutorialSkip" class="action-btn">Saltar</button>
+          <button id="tutorialFinish" class="action-btn primary">Finalizar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay hidden" id="continueOverlay" aria-live="polite">
+      <div class="overlay-card">
+        <p class="eyebrow">Partida guardada</p>
+        <h2>¿Quieres continuar?</h2>
+        <p>Se ha detectado una partida guardada en este dispositivo.</p>
+        <div class="overlay-actions">
+          <button id="continueGameBtn" class="action-btn primary">Continuar partida</button>
+          <button id="newSavedGameBtn" class="action-btn">Nueva partida</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay hidden" id="confirmOverlay" aria-live="polite">
+      <div class="overlay-card">
+        <p class="eyebrow">Confirmación</p>
+        <h2>¿Deseas comenzar una nueva partida?</h2>
+        <p>Tu progreso actual se perderá si confirmas este cambio.</p>
+        <div class="overlay-actions">
+          <button id="cancelNewGameBtn" class="action-btn">Cancelar</button>
+          <button id="confirmNewGameBtn" class="action-btn primary">Nueva partida</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay hidden" id="resultModal" aria-live="assertive">
+      <div class="overlay-card result-card">
+        <p class="eyebrow">Fin de partida</p>
+        <h2 id="resultTitle">¡Sudoku Completado!</h2>
+        <p id="resultMessage"></p>
+        <div class="result-details" id="resultDetails"></div>
+        <div class="overlay-actions">
+          <button id="resultNewGameBtn" class="action-btn primary">Nueva partida</button>
+          <button id="resultCloseBtn" class="action-btn">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/app.js"></script>
+  </body>
+</html>
