@@ -83,7 +83,8 @@ const TRANSLATIONS = {
     undoToastTitle: "↩ Move undone",
     undoToastMessage: "The last move was undone.",
     hintToastTitle: "💡 Hint used",
-    hintToastMessage: "A correct number was revealed. Hints remaining: {count}",
+    hintToastMessage: "Number {value} was revealed at row {row}, column {col}. Hints remaining: {count}",
+    hintUnavailableMessage: "No hint can be placed without conflicting with the numbers currently on the board.",
     completedToastTitle: "🎉 Sudoku complete",
     completedToastMessage: "You completed the game successfully.",
     errorLimitToastTitle: "❌ Error limit reached",
@@ -96,7 +97,7 @@ const TRANSLATIONS = {
       { title: "3×3 boxes", text: "Each 3×3 box must also contain the numbers 1 to 9 exactly once.", demo: "Thicker lines clearly mark each 3×3 box." },
       { title: "Notes", text: "Turn on Notes to jot down possible numbers without committing them to the board.", demo: "Small notes in a cell help you track candidates." },
       { title: "Hints", text: "Each game includes up to three hints. A hint reveals a correct number and reduces your score.", demo: "Use a hint when you get stuck." },
-      { title: "Errors", text: "Incorrect entries count toward your limit. Reaching it ends the game.", demo: "Think carefully to protect your score." },
+      { title: "Errors", text: "Numbers that conflict with a row, column, or 3×3 box count toward your error limit.", demo: "A number can be placed even if it is not the final solution, as long as it follows Sudoku's rules." },
       { title: "Score", text: "Your final score depends on difficulty, time, errors, and hints used.", demo: "The timer and error count update as you play." },
       { title: "Ready to play", text: "Select an empty cell and enter a number to begin solving.", demo: "Start a new game whenever you are ready." },
     ],
@@ -176,7 +177,8 @@ const TRANSLATIONS = {
     undoToastTitle: "↩ Movimiento deshecho",
     undoToastMessage: "Se deshizo el último movimiento.",
     hintToastTitle: "💡 Pista utilizada",
-    hintToastMessage: "Se reveló un número correcto. Pistas restantes: {count}",
+    hintToastMessage: "Se agregó el número {value} en la fila {row}, columna {col}. Pistas restantes: {count}",
+    hintUnavailableMessage: "No hay una pista que se pueda colocar sin entrar en conflicto con los números actuales.",
     completedToastTitle: "🎉 Sudoku completado",
     completedToastMessage: "Completaste la partida con éxito.",
     errorLimitToastTitle: "❌ Límite de errores",
@@ -189,7 +191,7 @@ const TRANSLATIONS = {
       { title: "Bloques de 3×3", text: "Cada bloque de 3×3 también debe contener los números del 1 al 9 exactamente una vez.", demo: "Las líneas más gruesas delimitan claramente cada bloque de 3×3." },
       { title: "Notas", text: "Activa Notas para apuntar posibles números sin colocarlos definitivamente en el tablero.", demo: "Las notas pequeñas ayudan a recordar los candidatos de cada casilla." },
       { title: "Pistas", text: "Cada partida incluye hasta tres pistas. Una pista revela un número correcto y reduce tu puntuación.", demo: "Usa una pista cuando te quedes atascado." },
-      { title: "Errores", text: "Los números incorrectos cuentan para el límite. Al alcanzarlo, termina la partida.", demo: "Piensa bien tus jugadas para proteger tu puntuación." },
+      { title: "Errores", text: "Los números que se repiten en una fila, columna o bloque de 3×3 cuentan para el límite de errores.", demo: "Puedes colocar un número aunque no sea la solución final, siempre que respete las reglas del Sudoku." },
       { title: "Puntuación", text: "La puntuación final depende de la dificultad, el tiempo, los errores y las pistas utilizadas.", demo: "El cronómetro y el contador de errores se actualizan mientras juegas." },
       { title: "Listo para jugar", text: "Selecciona una casilla vacía e introduce un número para empezar a resolver.", demo: "Inicia una nueva partida cuando estés listo." },
     ],
@@ -652,7 +654,7 @@ function renderBoard() {
       if (isHighlightCol) cell.classList.add("highlight-col");
       if (isHighlightBox) cell.classList.add("highlight-box");
       if (isSameValue) cell.classList.add("same-value");
-      if (value !== 0 && (!isValidPlacementAt(row, col, value) || (!isFixed && value !== state.solutionBoard[row][col]))) {
+      if (value !== 0 && !isValidPlacementAt(row, col, value)) {
         cell.classList.add("invalid");
       }
 
@@ -700,12 +702,11 @@ function placeValue(value) {
     return;
   }
 
-  const valid = isValidPlacementAt(row, col, value) && state.solutionBoard[row][col] === value;
+  const valid = isValidPlacementAt(row, col, value);
   if (valid) {
     state.currentBoard[row][col] = value;
     state.notesBoard[row][col] = [];
     state.history.push(previousState);
-    flashCell(row, col, "revealed");
     if (isBoardSolved()) {
       finishGame(true);
       return;
@@ -713,12 +714,12 @@ function placeValue(value) {
   } else {
     state.errors += 1;
     state.history.push(previousState);
-    flashCell(row, col, "invalid");
     showToast("error", translate("incorrectTitle"), translate("incorrectMessage", { errors: state.errors, max: state.maxErrors }));
   }
 
   updateStatus();
   renderBoard();
+  flashCell(row, col, valid ? "revealed" : "invalid");
   persistGame();
 }
 
@@ -775,23 +776,34 @@ function useHint() {
   const emptyCells = [];
   for (let row = 0; row < 9; row += 1) {
     for (let col = 0; col < 9; col += 1) {
-      if (state.currentBoard[row][col] === 0) {
+      if (state.currentBoard[row][col] === 0
+        && isValidPlacementAt(row, col, state.solutionBoard[row][col])) {
         emptyCells.push({ row, col });
       }
     }
   }
-  if (!emptyCells.length) return;
+  if (!emptyCells.length) {
+    showToast("warning", translate("hintToastTitle"), translate("hintUnavailableMessage"));
+    return;
+  }
   const target = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+  const value = state.solutionBoard[target.row][target.col];
   const previousState = captureState();
-  state.currentBoard[target.row][target.col] = state.solutionBoard[target.row][target.col];
+  state.currentBoard[target.row][target.col] = value;
   state.notesBoard[target.row][target.col] = [];
   state.hintsUsed += 1;
   state.history.push(previousState);
-  flashCell(target.row, target.col, "revealed");
+  state.selectedCell = target;
   updateStatus();
   renderBoard();
+  flashCell(target.row, target.col, "hint-revealed", 1800);
   persistGame();
-  showToast("warning", translate("hintToastTitle"), translate("hintToastMessage", { count: Math.max(0, 3 - state.hintsUsed) }));
+  showToast("warning", translate("hintToastTitle"), translate("hintToastMessage", {
+    value,
+    row: target.row + 1,
+    col: target.col + 1,
+    count: Math.max(0, 3 - state.hintsUsed),
+  }));
   if (isBoardSolved()) {
     finishGame(true);
   }
@@ -1100,12 +1112,12 @@ function hideOverlay(element) {
   element.classList.add("hidden");
 }
 
-function flashCell(row, col, className) {
+function flashCell(row, col, className, duration = 420) {
   const selector = `.cell[data-row="${row}"][data-col="${col}"]`;
   const cell = boardElement.querySelector(selector);
   if (cell) {
     cell.classList.add(className);
-    setTimeout(() => cell.classList.remove(className), 420);
+    setTimeout(() => cell.classList.remove(className), duration);
   }
 }
 
