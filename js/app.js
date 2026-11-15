@@ -48,7 +48,6 @@ const hintsElement = document.getElementById("hints");
 const scoreElement = document.getElementById("score");
 const difficultySelect = document.getElementById("difficultySelect");
 const currentDifficulty = document.getElementById("currentDifficulty");
-const modeLabel = document.getElementById("modeLabel");
 const pauseOverlay = document.getElementById("pauseOverlay");
 const tutorialOverlay = document.getElementById("tutorialOverlay");
 const continueOverlay = document.getElementById("continueOverlay");
@@ -357,9 +356,6 @@ function toggleNoteMode() {
   if (pencilBtn) {
     pencilBtn.classList.toggle("active", state.isNoteMode);
     pencilBtn.textContent = state.isNoteMode ? "✎ Lápiz activo" : "✎ Lápiz";
-  }
-  if (modeLabel) {
-    modeLabel.textContent = state.isNoteMode ? "Lápiz" : "Normal";
   }
 }
 
