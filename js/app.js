@@ -1,9 +1,9 @@
 const STORAGE_KEY = "sudoku-studio-save";
 const TUTORIAL_KEY = "sudoku-studio-tutorial";
 const DIFFICULTY_SETTINGS = {
-  easy: { targetEmpty: 36, maxErrors: 5, bonus: 220, label: "Fácil" },
-  medium: { targetEmpty: 42, maxErrors: 4, bonus: 360, label: "Medio" },
-  hard: { targetEmpty: 48, maxErrors: 3, bonus: 520, label: "Difícil" },
+  easy: { targetEmpty: 44, maxErrors: 5, bonus: 220, label: "Fácil" },
+  medium: { targetEmpty: 48, maxErrors: 4, bonus: 360, label: "Medio" },
+  hard: { targetEmpty: 52, maxErrors: 3, bonus: 520, label: "Difícil" },
   extreme: { targetEmpty: 54, maxErrors: 3, bonus: 700, label: "Extremo" },
 };
 
@@ -430,7 +430,9 @@ function renderBoard() {
       if (isHighlightCol) cell.classList.add("highlight-col");
       if (isHighlightBox) cell.classList.add("highlight-box");
       if (isSameValue) cell.classList.add("same-value");
-      if (value !== 0 && !isValidPlacementAt(row, col, value, true)) cell.classList.add("invalid");
+      if (value !== 0 && (!isValidPlacementAt(row, col, value) || (!isFixed && value !== state.solutionBoard[row][col]))) {
+        cell.classList.add("invalid");
+      }
 
       cell.dataset.row = row;
       cell.dataset.col = col;
@@ -477,11 +479,7 @@ function placeValue(value) {
     return;
   }
 
-  if (state.currentBoard[row][col] !== 0) {
-    state.currentBoard[row][col] = 0;
-  }
-
-  const valid = isValidPlacementAt(row, col, value, false);
+  const valid = isValidPlacementAt(row, col, value) && state.solutionBoard[row][col] === value;
   if (valid) {
     state.currentBoard[row][col] = value;
     state.notesBoard[row][col] = [];
@@ -578,7 +576,7 @@ function useHint() {
   }
 }
 
-function isValidPlacementAt(row, col, value, skipSelf) {
+function isValidPlacementAt(row, col, value) {
   for (let index = 0; index < 9; index += 1) {
     if (index !== col && state.currentBoard[row][index] === value) return false;
     if (index !== row && state.currentBoard[index][col] === value) return false;
@@ -676,21 +674,40 @@ function generatePuzzle(difficulty) {
   const positions = [];
   for (let row = 0; row < 9; row += 1) {
     for (let col = 0; col < 9; col += 1) {
-      positions.push({ row, col });
+      const mirroredRow = 8 - row;
+      const mirroredCol = 8 - col;
+      const positionIndex = row * 9 + col;
+      const mirroredIndex = mirroredRow * 9 + mirroredCol;
+      if (positionIndex < mirroredIndex) {
+        positions.push([{ row, col }, { row: mirroredRow, col: mirroredCol }]);
+      }
     }
   }
 
   shuffleArray(positions);
   let removed = 0;
-  for (const position of positions) {
+  for (const pair of positions) {
     if (removed >= targetEmpty) break;
-    const { row, col } = position;
-    const backup = initialBoard[row][col];
-    initialBoard[row][col] = 0;
+    const [first, second] = pair;
+    const firstValue = initialBoard[first.row][first.col];
+    const secondValue = initialBoard[second.row][second.col];
+    initialBoard[first.row][first.col] = 0;
+    initialBoard[second.row][second.col] = 0;
     if (countSolutions(initialBoard) !== 1) {
-      initialBoard[row][col] = backup;
+      initialBoard[first.row][first.col] = firstValue;
+      initialBoard[second.row][second.col] = secondValue;
     } else {
+      removed += 2;
+    }
+  }
+
+  if (removed < targetEmpty) {
+    const centerValue = initialBoard[4][4];
+    initialBoard[4][4] = 0;
+    if (countSolutions(initialBoard) === 1) {
       removed += 1;
+    } else {
+      initialBoard[4][4] = centerValue;
     }
   }
 
@@ -730,31 +747,40 @@ function countSolutions(board) {
   let solutions = 0;
   const solve = () => {
     if (solutions >= 2) return;
-    const emptyPosition = findEmptyCell(workingBoard);
+    const emptyPosition = findBestEmptyCell(workingBoard);
     if (!emptyPosition) {
       solutions += 1;
       return;
     }
-    const { row, col } = emptyPosition;
-    for (const value of shuffleArray([1, 2, 3, 4, 5, 6, 7, 8, 9])) {
-      if (isValidResolved(workingBoard, row, col, value)) {
-        workingBoard[row][col] = value;
-        solve();
-        workingBoard[row][col] = 0;
-      }
+    const { row, col, candidates } = emptyPosition;
+    for (const value of candidates) {
+      workingBoard[row][col] = value;
+      solve();
+      workingBoard[row][col] = 0;
+      if (solutions >= 2) return;
     }
   };
   solve();
   return solutions;
 }
 
-function findEmptyCell(board) {
+function findBestEmptyCell(board) {
+  let bestPosition = null;
   for (let row = 0; row < 9; row += 1) {
     for (let col = 0; col < 9; col += 1) {
-      if (board[row][col] === 0) return { row, col };
+      if (board[row][col] !== 0) continue;
+      const candidates = [];
+      for (let value = 1; value <= 9; value += 1) {
+        if (isValidResolved(board, row, col, value)) candidates.push(value);
+      }
+      if (candidates.length === 0) return { row, col, candidates };
+      if (!bestPosition || candidates.length < bestPosition.candidates.length) {
+        bestPosition = { row, col, candidates };
+        if (candidates.length === 1) return bestPosition;
+      }
     }
   }
-  return null;
+  return bestPosition;
 }
 
 function isValidResolved(board, row, col, value) {
