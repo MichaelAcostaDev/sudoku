@@ -1,26 +1,203 @@
 const STORAGE_KEY = "sudoku-studio-save";
 const TUTORIAL_KEY = "sudoku-studio-tutorial";
 const DIFFICULTY_SETTINGS = {
-  easy: { targetEmpty: 44, maxErrors: 5, bonus: 220, label: "Fácil" },
-  medium: { targetEmpty: 48, maxErrors: 4, bonus: 360, label: "Medio" },
-  hard: { targetEmpty: 52, maxErrors: 3, bonus: 520, label: "Difícil" },
-  extreme: { targetEmpty: 54, maxErrors: 3, bonus: 700, label: "Extremo" },
+  easy: { targetEmpty: 44, maxErrors: 5, bonus: 220 },
+  medium: { targetEmpty: 48, maxErrors: 4, bonus: 360 },
+  hard: { targetEmpty: 52, maxErrors: 3, bonus: 520 },
+  extreme: { targetEmpty: 54, maxErrors: 3, bonus: 700 },
 };
 
-const TUTORIAL_STEPS = [
-  { title: "¿Qué es Sudoku?", text: "Sudoku es un juego de lógica en el que debes rellenar una cuadrícula 9×9 con números del 1 al 9 sin repetir en filas, columnas ni bloques de 3×3.", demo: "Cada fila, columna y bloque debe quedar completo y sin repeticiones." },
-  { title: "Objetivo", text: "Tu meta es completar todas las celdas vacías con la solución correcta antes de agotar los errores permitidos.", demo: "Las celdas fijas ya están resueltas y no se pueden modificar." },
-  { title: "Filas", text: "Cada fila debe contener todos los números del 1 al 9 exactamente una vez.", demo: "Observa cómo se reparten los valores según la fila actual." },
-  { title: "Columnas", text: "Cada columna debe cumplir el mismo principio, evitando repeticiones.", demo: "Las columnas y las filas comparten la misma lógica de validación." },
-  { title: "Bloques 3×3", text: "Cada bloque de 3×3 también debe contener los números del 1 al 9 una vez cada uno.", demo: "Los bloques están separados por líneas más gruesas para facilitar la lectura." },
-  { title: "Modo lápiz", text: "Activa el lápiz para dejar notas temporales y probar posibles soluciones sin comprometer el tablero.", demo: "Las anotaciones aparecen pequeñas en cada celda y ayudan a analizar." },
-  { title: "Pistas", text: "Cada partida incluye hasta 3 pistas. Se revelará un número correcto y se descontará puntos.", demo: "Las pistas son útiles cuando el tablero se complica." },
-  { title: "Errores", text: "Los errores cuentan contra tu límite. Al alcanzarlo, la partida termina y aparece la pantalla de derrota.", demo: "Cuida tus decisiones si quieres mantener la puntuación alta." },
-  { title: "Puntuación", text: "La puntuación final combina dificultad, tiempo, errores y pistas. Cuanto mejor juegues, mejor será tu resultado.", demo: "El temporizador y el contador de errores se actualizan en tiempo real." },
-  { title: "Comenzar a jugar", text: "Ya estás listo para empezar. Selecciona una celda, añade un número y disfruta del juego.", demo: "Tu experiencia comienza con una partida nueva y una cuadrícula lista para resolver." },
-];
+const TRANSLATIONS = {
+  en: {
+    documentTitle: "Sudoku Studio",
+    gameTagline: "Logic game",
+    difficulty: "Difficulty",
+    easy: "Easy",
+    medium: "Medium",
+    hard: "Hard",
+    extreme: "Extreme",
+    tutorialButton: "Tutorial",
+    newGame: "New game",
+    pause: "Pause",
+    resume: "Resume",
+    statusRegion: "Game status",
+    time: "Time",
+    errors: "Errors",
+    hints: "Hints",
+    score: "Score",
+    boardLabel: "Sudoku board",
+    numberPadLabel: "Number pad",
+    mobileKeypadLabel: "Touch keypad",
+    pencil: "✎ Notes",
+    pencilActive: "✎ Notes on",
+    undo: "↶ Undo",
+    hint: "💡 Hint",
+    restart: "↻ Restart",
+    clear: "Clear",
+    footerCredit: "Created by Michael Acosta",
+    profilesLabel: "Michael Acosta's profiles",
+    githubProfile: "Michael Acosta on GitHub",
+    linkedinProfile: "Michael Acosta on LinkedIn",
+    pausedEyebrow: "Paused",
+    pausedTitle: "Game paused",
+    continue: "Continue",
+    exit: "Exit",
+    tutorialEyebrow: "Guided tutorial",
+    previous: "Previous",
+    next: "Next",
+    skip: "Skip",
+    finish: "Finish",
+    savedEyebrow: "Saved game",
+    continueQuestion: "Continue your game?",
+    savedGameMessage: "A saved game was found on this device.",
+    continueGame: "Continue game",
+    confirmation: "Confirmation",
+    confirmNewGameQuestion: "Start a new game?",
+    loseProgressMessage: "Your current progress will be lost if you continue.",
+    cancel: "Cancel",
+    gameOverEyebrow: "Game over",
+    victoryTitle: "Sudoku complete!",
+    defeatTitle: "Error limit reached",
+    victoryMessage: "You completed the board in {time}.",
+    defeatMessage: "The game is over. Try again or start a new game.",
+    resultNewGame: "New game",
+    close: "Close",
+    difficultyDetail: "<strong>Difficulty:</strong> {value}",
+    timeDetail: "<strong>Time:</strong> {value}",
+    playedTimeDetail: "<strong>Time played:</strong> {value}",
+    scoreDetail: "<strong>Score:</strong> {value}",
+    errorDetail: "<strong>Errors:</strong> {value}",
+    hintsUsedDetail: "<strong>Hints used:</strong> {value}",
+    exitToastTitle: "Game ended",
+    exitToastMessage: "You left the paused game.",
+    newGameToastTitle: "New game",
+    difficultyToast: "Difficulty: {value}",
+    restartToastTitle: "Restarted",
+    restartToastMessage: "The game has been reset.",
+    restoredToastTitle: "Game restored",
+    restoredToastMessage: "Your previous progress is ready.",
+    pauseToastTitle: "Paused",
+    pauseToastMessage: "The game is paused.",
+    incorrectTitle: "Incorrect number",
+    incorrectMessage: "Errors: {errors}/{max}",
+    undoToastTitle: "↩ Move undone",
+    undoToastMessage: "The last move was undone.",
+    hintToastTitle: "💡 Hint used",
+    hintToastMessage: "A correct number was revealed. Hints remaining: {count}",
+    completedToastTitle: "🎉 Sudoku complete",
+    completedToastMessage: "You completed the game successfully.",
+    errorLimitToastTitle: "❌ Error limit reached",
+    errorLimitToastMessage: "The game is over.",
+    tutorialSteps: [
+      { title: "What is Sudoku?", text: "Sudoku is a logic puzzle. Fill a 9×9 grid with the numbers 1 to 9 without repeating them in any row, column, or 3×3 box.", demo: "Every row, column, and box must contain each number exactly once." },
+      { title: "Goal", text: "Complete every empty cell with the correct number before reaching the error limit.", demo: "Given numbers are fixed and cannot be changed." },
+      { title: "Rows", text: "Each row must contain the numbers 1 to 9 exactly once.", demo: "Use the other cells in a row to work out which numbers are missing." },
+      { title: "Columns", text: "Each column follows the same rule: no repeated numbers.", demo: "Rows and columns are checked using the same logic." },
+      { title: "3×3 boxes", text: "Each 3×3 box must also contain the numbers 1 to 9 exactly once.", demo: "Thicker lines clearly mark each 3×3 box." },
+      { title: "Notes", text: "Turn on Notes to jot down possible numbers without committing them to the board.", demo: "Small notes in a cell help you track candidates." },
+      { title: "Hints", text: "Each game includes up to three hints. A hint reveals a correct number and reduces your score.", demo: "Use a hint when you get stuck." },
+      { title: "Errors", text: "Incorrect entries count toward your limit. Reaching it ends the game.", demo: "Think carefully to protect your score." },
+      { title: "Score", text: "Your final score depends on difficulty, time, errors, and hints used.", demo: "The timer and error count update as you play." },
+      { title: "Ready to play", text: "Select an empty cell and enter a number to begin solving.", demo: "Start a new game whenever you are ready." },
+    ],
+  },
+  es: {
+    documentTitle: "Sudoku Studio",
+    gameTagline: "Juego de lógica",
+    difficulty: "Dificultad",
+    easy: "Fácil",
+    medium: "Medio",
+    hard: "Difícil",
+    extreme: "Extremo",
+    tutorialButton: "Tutorial",
+    newGame: "Nueva partida",
+    pause: "Pausa",
+    resume: "Continuar",
+    statusRegion: "Estado del juego",
+    time: "Tiempo",
+    errors: "Errores",
+    hints: "Pistas",
+    score: "Puntuación",
+    boardLabel: "Tablero de Sudoku",
+    numberPadLabel: "Teclado numérico",
+    mobileKeypadLabel: "Teclado táctil",
+    pencil: "✎ Notas",
+    pencilActive: "✎ Notas activas",
+    undo: "↶ Deshacer",
+    hint: "💡 Pista",
+    restart: "↻ Reiniciar",
+    clear: "Borrar",
+    footerCredit: "Creado por Michael Acosta",
+    profilesLabel: "Perfiles de Michael Acosta",
+    githubProfile: "Michael Acosta en GitHub",
+    linkedinProfile: "Michael Acosta en LinkedIn",
+    pausedEyebrow: "Pausa",
+    pausedTitle: "Partida pausada",
+    continue: "Continuar",
+    exit: "Salir",
+    tutorialEyebrow: "Tutorial guiado",
+    previous: "Anterior",
+    next: "Siguiente",
+    skip: "Saltar",
+    finish: "Finalizar",
+    savedEyebrow: "Partida guardada",
+    continueQuestion: "¿Quieres continuar?",
+    savedGameMessage: "Se encontró una partida guardada en este dispositivo.",
+    continueGame: "Continuar partida",
+    confirmation: "Confirmación",
+    confirmNewGameQuestion: "¿Empezar una nueva partida?",
+    loseProgressMessage: "Perderás el progreso actual si continúas.",
+    cancel: "Cancelar",
+    gameOverEyebrow: "Fin de partida",
+    victoryTitle: "¡Sudoku completado!",
+    defeatTitle: "Has alcanzado el límite de errores",
+    victoryMessage: "Completaste el tablero en {time}.",
+    defeatMessage: "La partida terminó. Inténtalo otra vez o comienza una nueva.",
+    resultNewGame: "Nueva partida",
+    close: "Cerrar",
+    difficultyDetail: "<strong>Dificultad:</strong> {value}",
+    timeDetail: "<strong>Tiempo:</strong> {value}",
+    playedTimeDetail: "<strong>Tiempo jugado:</strong> {value}",
+    scoreDetail: "<strong>Puntuación:</strong> {value}",
+    errorDetail: "<strong>Errores:</strong> {value}",
+    hintsUsedDetail: "<strong>Pistas usadas:</strong> {value}",
+    exitToastTitle: "Partida finalizada",
+    exitToastMessage: "Saliste de la partida en pausa.",
+    newGameToastTitle: "Nueva partida",
+    difficultyToast: "Dificultad: {value}",
+    restartToastTitle: "Partida reiniciada",
+    restartToastMessage: "La partida volvió a comenzar.",
+    restoredToastTitle: "Partida restaurada",
+    restoredToastMessage: "Tu progreso anterior está disponible.",
+    pauseToastTitle: "Pausa",
+    pauseToastMessage: "La partida está en pausa.",
+    incorrectTitle: "Número incorrecto",
+    incorrectMessage: "Errores: {errors}/{max}",
+    undoToastTitle: "↩ Movimiento deshecho",
+    undoToastMessage: "Se deshizo el último movimiento.",
+    hintToastTitle: "💡 Pista utilizada",
+    hintToastMessage: "Se reveló un número correcto. Pistas restantes: {count}",
+    completedToastTitle: "🎉 Sudoku completado",
+    completedToastMessage: "Completaste la partida con éxito.",
+    errorLimitToastTitle: "❌ Límite de errores",
+    errorLimitToastMessage: "La partida terminó.",
+    tutorialSteps: [
+      { title: "¿Qué es Sudoku?", text: "Sudoku es un juego de lógica. Completa una cuadrícula de 9×9 con números del 1 al 9 sin repetirlos en ninguna fila, columna o bloque de 3×3.", demo: "Cada fila, columna y bloque debe contener cada número exactamente una vez." },
+      { title: "Objetivo", text: "Completa todas las casillas vacías con el número correcto antes de alcanzar el límite de errores.", demo: "Los números iniciales están fijos y no se pueden cambiar." },
+      { title: "Filas", text: "Cada fila debe contener los números del 1 al 9 exactamente una vez.", demo: "Usa las demás casillas de la fila para deducir qué números faltan." },
+      { title: "Columnas", text: "Cada columna sigue la misma regla: no se repiten números.", demo: "Las filas y las columnas se validan con la misma lógica." },
+      { title: "Bloques de 3×3", text: "Cada bloque de 3×3 también debe contener los números del 1 al 9 exactamente una vez.", demo: "Las líneas más gruesas delimitan claramente cada bloque de 3×3." },
+      { title: "Notas", text: "Activa Notas para apuntar posibles números sin colocarlos definitivamente en el tablero.", demo: "Las notas pequeñas ayudan a recordar los candidatos de cada casilla." },
+      { title: "Pistas", text: "Cada partida incluye hasta tres pistas. Una pista revela un número correcto y reduce tu puntuación.", demo: "Usa una pista cuando te quedes atascado." },
+      { title: "Errores", text: "Los números incorrectos cuentan para el límite. Al alcanzarlo, termina la partida.", demo: "Piensa bien tus jugadas para proteger tu puntuación." },
+      { title: "Puntuación", text: "La puntuación final depende de la dificultad, el tiempo, los errores y las pistas utilizadas.", demo: "El cronómetro y el contador de errores se actualizan mientras juegas." },
+      { title: "Listo para jugar", text: "Selecciona una casilla vacía e introduce un número para empezar a resolver.", demo: "Inicia una nueva partida cuando estés listo." },
+    ],
+  },
+};
 
 const state = {
+  language: "en",
   difficulty: "easy",
   initialBoard: [],
   solutionBoard: [],
@@ -93,6 +270,8 @@ const toastContainer = document.getElementById("toastContainer");
 let tutorialStep = 0;
 
 function init() {
+  state.language = detectLanguage();
+  applyTranslations();
   bindEvents();
   renderNumberPad();
   renderMobileKeypad();
@@ -105,6 +284,44 @@ function init() {
   } else {
     startNewGame();
   }
+}
+
+function detectLanguage() {
+  const preferredLanguages = navigator.languages && navigator.languages.length
+    ? navigator.languages
+    : [navigator.language || "en"];
+  for (const preferredLanguage of preferredLanguages) {
+    const language = preferredLanguage.toLowerCase().split("-")[0];
+    if (language === "en" || language === "es") return language;
+  }
+  return "en";
+}
+
+function translate(key, values) {
+  let text = TRANSLATIONS[state.language][key];
+  if (values) {
+    text = text.replace(/\{(\w+)\}/g, (_, name) => values[name]);
+  }
+  return text;
+}
+
+function applyTranslations() {
+  document.documentElement.lang = state.language;
+  document.title = translate("documentTitle");
+  document.querySelectorAll("[data-i18n]").forEach((element) => {
+    element.textContent = translate(element.dataset.i18n);
+  });
+  document.querySelectorAll("[data-i18n-aria]").forEach((element) => {
+    element.setAttribute("aria-label", translate(element.dataset.i18nAria));
+  });
+}
+
+function getDifficultyLabel(difficulty) {
+  return translate(difficulty);
+}
+
+function getTutorialSteps() {
+  return TRANSLATIONS[state.language].tutorialSteps;
 }
 
 function bindEvents() {
@@ -127,7 +344,7 @@ function bindEvents() {
       state.isPaused = false;
       state.gameFinished = true;
       if (boardWrapper) boardWrapper.classList.remove("paused");
-      showToast("info", "Salida", "Has dejado la partida en pausa.");
+      showToast("info", translate("exitToastTitle"), translate("exitToastMessage"));
     });
   }
   if (pencilBtn) pencilBtn.addEventListener("click", toggleNoteMode);
@@ -253,11 +470,12 @@ function startNewGame() {
   hideOverlay(confirmOverlay);
   if (boardWrapper) boardWrapper.classList.remove("paused");
   pencilBtn.classList.remove("active");
-  pauseBtn.textContent = "Pausa";
+  updateNoteModeButton();
+  pauseBtn.textContent = translate("pause");
   updateStatus();
   renderBoard();
   startTimer();
-  showToast("success", "Nueva partida", `Dificultad: ${DIFFICULTY_SETTINGS[state.difficulty].label}`);
+  showToast("success", translate("newGameToastTitle"), translate("difficultyToast", { value: getDifficultyLabel(state.difficulty) }));
 }
 
 function restartGame() {
@@ -274,6 +492,7 @@ function restartGame() {
   state.history = [];
   state.isNoteMode = false;
   pencilBtn.classList.remove("active");
+  updateNoteModeButton();
   if (state.timerInterval) clearInterval(state.timerInterval);
   state.timerInterval = null;
   hideOverlay(resultModal);
@@ -283,7 +502,7 @@ function restartGame() {
   updateStatus();
   renderBoard();
   startTimer();
-  showToast("info", "Reiniciado", "La partida ha vuelto a empezar.");
+  showToast("info", translate("restartToastTitle"), translate("restartToastMessage"));
 }
 
 function continueSavedGame() {
@@ -294,10 +513,11 @@ function continueSavedGame() {
   state.gameFinished = false;
   state.isNoteMode = false;
   pencilBtn.classList.remove("active");
+  updateNoteModeButton();
   updateStatus();
   renderBoard();
   startTimer();
-  showToast("info", "Partida restaurada", "Tu progreso anterior ya está disponible.");
+  showToast("info", translate("restoredToastTitle"), translate("restoredToastMessage"));
 }
 
 function createEmptyNotes() {
@@ -328,16 +548,16 @@ function startTimer() {
 function togglePause() {
   if (state.gameFinished) return;
   state.isPaused = !state.isPaused;
-  pauseBtn.textContent = state.isPaused ? "Reanudar" : "Pausa";
+  pauseBtn.textContent = translate(state.isPaused ? "resume" : "pause");
   pauseTime.textContent = formatTime(state.elapsedSeconds);
-  pauseDifficulty.textContent = DIFFICULTY_SETTINGS[state.difficulty].label;
-  pauseErrors.textContent = `${state.errors}/${state.maxErrors}`;
+  pauseDifficulty.textContent = getDifficultyLabel(state.difficulty);
+  pauseErrors.textContent = `${state.errors} / ${state.maxErrors}`;
   pauseScore.textContent = calculateScore();
   if (state.isPaused) {
     if (state.timerInterval) clearInterval(state.timerInterval);
     if (boardWrapper) boardWrapper.classList.add("paused");
     showOverlay(pauseOverlay);
-    showToast("warning", "Pausa", "La partida está en pausa.");
+    showToast("warning", translate("pauseToastTitle"), translate("pauseToastMessage"));
   } else {
     if (boardWrapper) boardWrapper.classList.remove("paused");
     hideOverlay(pauseOverlay);
@@ -353,9 +573,13 @@ function resumeGame() {
 
 function toggleNoteMode() {
   state.isNoteMode = !state.isNoteMode;
+  updateNoteModeButton();
+}
+
+function updateNoteModeButton() {
   if (pencilBtn) {
     pencilBtn.classList.toggle("active", state.isNoteMode);
-    pencilBtn.textContent = state.isNoteMode ? "✎ Lápiz activo" : "✎ Lápiz";
+    pencilBtn.textContent = translate(state.isNoteMode ? "pencilActive" : "pencil");
   }
 }
 
@@ -379,19 +603,20 @@ function renderNumberPad() {
   });
   const clearButton = document.createElement("button");
   clearButton.className = "clear-btn";
-  clearButton.textContent = "Borrar";
+  clearButton.textContent = translate("clear");
   clearButton.addEventListener("click", clearSelectedCell);
   numPad.appendChild(clearButton);
 }
 
 function renderMobileKeypad() {
-  const values = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "Borrar"];
+  const clearLabel = translate("clear");
+  const values = ["1", "2", "3", "4", "5", "6", "7", "8", "9", clearLabel];
   mobileKeypad.innerHTML = "";
   values.forEach((value) => {
     const button = document.createElement("button");
     button.textContent = value;
     button.addEventListener("click", () => {
-      if (value === "Borrar") {
+      if (value === clearLabel) {
         clearSelectedCell();
       } else {
         placeValue(Number(value));
@@ -419,10 +644,9 @@ function renderBoard() {
       const isHighlightRow = selectedRow === row;
       const isHighlightCol = selectedCol === col;
       const isHighlightBox = selectedRow !== null && selectedCol !== null && getBoxIndex(selectedRow, selectedCol) === getBoxIndex(row, col);
-      const isShadedBox = (Math.floor(row / 3) + Math.floor(col / 3)) % 2 === 0;
-
       if (isFixed) cell.classList.add("locked");
-      if (isShadedBox) cell.classList.add("box-shade");
+      if (col === 2 || col === 5) cell.classList.add("box-right");
+      if (row === 2 || row === 5) cell.classList.add("box-bottom");
       if (isSelected) cell.classList.add("selected");
       if (isHighlightRow) cell.classList.add("highlight-row");
       if (isHighlightCol) cell.classList.add("highlight-col");
@@ -434,7 +658,6 @@ function renderBoard() {
 
       cell.dataset.row = row;
       cell.dataset.col = col;
-      cell.style.animationDelay = `${(row * 18 + col * 8) % 240}ms`;
       cell.addEventListener("click", () => selectCell(row, col));
 
       if (value !== 0) {
@@ -491,7 +714,7 @@ function placeValue(value) {
     state.errors += 1;
     state.history.push(previousState);
     flashCell(row, col, "invalid");
-    showToast("error", "Número incorrecto", `Errores: ${state.errors}/${state.maxErrors}`);
+    showToast("error", translate("incorrectTitle"), translate("incorrectMessage", { errors: state.errors, max: state.maxErrors }));
   }
 
   updateStatus();
@@ -544,7 +767,7 @@ function undoMove() {
   updateStatus();
   renderBoard();
   persistGame();
-  showToast("warning", "↩ Movimiento revertido", "El último cambio ha sido deshecho.");
+  showToast("warning", translate("undoToastTitle"), translate("undoToastMessage"));
 }
 
 function useHint() {
@@ -568,7 +791,7 @@ function useHint() {
   updateStatus();
   renderBoard();
   persistGame();
-  showToast("warning", "💡 Pista utilizada", `Se reveló un número correcto. Pistas restantes: ${Math.max(0, 3 - state.hintsUsed)}`);
+  showToast("warning", translate("hintToastTitle"), translate("hintToastMessage", { count: Math.max(0, 3 - state.hintsUsed) }));
   if (isBoardSolved()) {
     finishGame(true);
   }
@@ -607,17 +830,27 @@ function finishGame(victory) {
   hideOverlay(tutorialOverlay);
   hideOverlay(continueOverlay);
   if (victory) {
-    resultTitle.textContent = "¡Sudoku Completado!";
-    resultMessage.textContent = `Has completado el tablero en ${formatTime(state.elapsedSeconds)}.`;
-    resultDetails.innerHTML = `<div><strong>Dificultad:</strong> ${DIFFICULTY_SETTINGS[state.difficulty].label}</div><div><strong>Tiempo:</strong> ${formatTime(state.elapsedSeconds)}</div><div><strong>Puntuación:</strong> ${calculateScore()}</div><div><strong>Errores:</strong> ${state.errors}</div><div><strong>Pistas usadas:</strong> ${state.hintsUsed}</div>`;
+    resultTitle.textContent = translate("victoryTitle");
+    resultMessage.textContent = translate("victoryMessage", { time: formatTime(state.elapsedSeconds) });
+    resultDetails.innerHTML = [
+      translate("difficultyDetail", { value: getDifficultyLabel(state.difficulty) }),
+      translate("timeDetail", { value: formatTime(state.elapsedSeconds) }),
+      translate("scoreDetail", { value: calculateScore() }),
+      translate("errorDetail", { value: state.errors }),
+      translate("hintsUsedDetail", { value: state.hintsUsed }),
+    ].map((detail) => `<div>${detail}</div>`).join("");
     triggerConfetti();
-    showToast("success", "🎉 Sudoku completado", "Tu partida ha terminado con éxito.");
+    showToast("success", translate("completedToastTitle"), translate("completedToastMessage"));
     showOverlay(resultModal);
   } else {
-    resultTitle.textContent = "Has alcanzado el límite de errores";
-    resultMessage.textContent = "La partida ha terminado. Puedes intentarlo de nuevo o abrir una nueva.";
-    resultDetails.innerHTML = `<div><strong>Dificultad:</strong> ${DIFFICULTY_SETTINGS[state.difficulty].label}</div><div><strong>Tiempo jugado:</strong> ${formatTime(state.elapsedSeconds)}</div><div><strong>Errores:</strong> ${state.errors}</div>`;
-    showToast("error", "❌ Límite de errores", "La partida ha terminado.");
+    resultTitle.textContent = translate("defeatTitle");
+    resultMessage.textContent = translate("defeatMessage");
+    resultDetails.innerHTML = [
+      translate("difficultyDetail", { value: getDifficultyLabel(state.difficulty) }),
+      translate("playedTimeDetail", { value: formatTime(state.elapsedSeconds) }),
+      translate("errorDetail", { value: state.errors }),
+    ].map((detail) => `<div>${detail}</div>`).join("");
+    showToast("error", translate("errorLimitToastTitle"), translate("errorLimitToastMessage"));
     showOverlay(resultModal);
   }
   clearSavedGame();
@@ -626,11 +859,11 @@ function finishGame(victory) {
 
 function updateStatus() {
   if (timerElement) timerElement.textContent = formatTime(state.elapsedSeconds);
-  if (errorsElement) errorsElement.textContent = `${state.errors}/${state.maxErrors}`;
+  if (errorsElement) errorsElement.textContent = `${state.errors} / ${state.maxErrors}`;
   if (hintsElement) hintsElement.textContent = `${Math.max(0, 3 - state.hintsUsed)}/3`;
   if (scoreElement) scoreElement.textContent = calculateScore();
-  if (currentDifficulty) currentDifficulty.textContent = DIFFICULTY_SETTINGS[state.difficulty].label;
-  if (pauseErrors) pauseErrors.textContent = `${state.errors}/${state.maxErrors}`;
+  if (currentDifficulty) currentDifficulty.textContent = getDifficultyLabel(state.difficulty);
+  if (pauseErrors) pauseErrors.textContent = `${state.errors} / ${state.maxErrors}`;
   if (pauseScore) pauseScore.textContent = calculateScore();
   if (state.errors >= state.maxErrors) {
     finishGame(false);
@@ -816,9 +1049,10 @@ function showTutorial() {
 }
 
 function changeTutorialStep(direction) {
+  const steps = getTutorialSteps();
   tutorialStep += direction;
   if (tutorialStep < 0) tutorialStep = 0;
-  if (tutorialStep >= TUTORIAL_STEPS.length) {
+  if (tutorialStep >= steps.length) {
     finishTutorial();
     return;
   }
@@ -826,14 +1060,15 @@ function changeTutorialStep(direction) {
 }
 
 function renderTutorialStep() {
-  const step = TUTORIAL_STEPS[tutorialStep];
+  const steps = getTutorialSteps();
+  const step = steps[tutorialStep];
   tutorialTitle.textContent = step.title;
   tutorialText.textContent = step.text;
   tutorialDemo.textContent = step.demo;
   tutorialPrev.disabled = tutorialStep === 0;
-  tutorialNext.textContent = tutorialStep === TUTORIAL_STEPS.length - 1 ? "Finalizar" : "Siguiente";
+  tutorialNext.textContent = translate(tutorialStep === steps.length - 1 ? "finish" : "next");
   progressDots.innerHTML = "";
-  TUTORIAL_STEPS.forEach((_, index) => {
+  steps.forEach((_, index) => {
     const dot = document.createElement("span");
     dot.className = `progress-dot${index === tutorialStep ? " active" : ""}`;
     progressDots.appendChild(dot);
@@ -876,7 +1111,7 @@ function flashCell(row, col, className) {
 
 function triggerConfetti() {
   confettiLayer.innerHTML = "";
-  const colors = ["#4A6CF7", "#355DE8", "#FFC107", "#2AB673"];
+  const colors = ["#0f0e12", "#000000", "#b2b2b2", "#f0a800"];
   for (let index = 0; index < 36; index += 1) {
     const piece = document.createElement("span");
     piece.className = "confetti-piece";

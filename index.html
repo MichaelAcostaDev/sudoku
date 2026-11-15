@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="theme-color" content="#F7F8FA" />
+    <meta name="theme-color" content="#f6f8f7" />
     <title>Sudoku Studio</title>
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
@@ -15,40 +15,40 @@
     <div class="app-shell">
       <header class="topbar">
         <div class="brand-block">
-          <p class="eyebrow">Juego de lógica</p>
+          <p class="eyebrow" data-i18n="gameTagline">Logic game</p>
           <h1>Sudoku Studio</h1>
         </div>
         <div class="header-actions">
           <label class="difficulty-select" for="difficultySelect">
-            <span>Dificultad</span>
+            <span data-i18n="difficulty">Difficulty</span>
             <select id="difficultySelect">
-              <option value="easy">Fácil</option>
-              <option value="medium">Medio</option>
-              <option value="hard">Difícil</option>
-              <option value="extreme">Extremo</option>
+              <option value="easy" data-i18n="easy">Easy</option>
+              <option value="medium" data-i18n="medium">Medium</option>
+              <option value="hard" data-i18n="hard">Hard</option>
+              <option value="extreme" data-i18n="extreme">Expert</option>
             </select>
           </label>
-          <button id="tutorialBtn" class="action-btn">Tutorial</button>
-          <button id="newGameBtn" class="action-btn primary">Nueva partida</button>
-          <button id="pauseBtn" class="action-btn">Pausa</button>
+          <button id="tutorialBtn" class="action-btn" data-i18n="tutorialButton">Tutorial</button>
+          <button id="newGameBtn" class="action-btn primary" data-i18n="newGame">New game</button>
+          <button id="pauseBtn" class="action-btn" data-i18n="pause">Pause</button>
         </div>
       </header>
 
-      <section class="status-bar" aria-label="Estado del juego">
+      <section class="status-bar" aria-label="Game status" data-i18n-aria="statusRegion">
         <article class="stat-card">
-          <span class="label">Tiempo</span>
+          <span class="label" data-i18n="time">Time</span>
           <strong id="timer">00:00</strong>
         </article>
         <article class="stat-card">
-          <span class="label">Errores</span>
+          <span class="label" data-i18n="errors">Errors</span>
           <strong id="errors">0 / 5</strong>
         </article>
         <article class="stat-card">
-          <span class="label">Pistas</span>
+          <span class="label" data-i18n="hints">Hints</span>
           <strong id="hints">3 / 3</strong>
         </article>
         <article class="stat-card">
-          <span class="label">Puntuación</span>
+          <span class="label" data-i18n="score">Score</span>
           <strong id="score">1000</strong>
         </article>
       </section>
@@ -57,21 +57,21 @@
         <section class="board-section">
           <div class="board-shell">
             <div class="board-wrapper" id="boardWrapper">
-              <div id="board" class="sudoku-board" role="grid" aria-label="Tablero de Sudoku"></div>
+              <div id="board" class="sudoku-board" role="grid" aria-label="Sudoku board" data-i18n-aria="boardLabel"></div>
             </div>
 
             <div class="controls-panel">
               <div class="game-meta">
-                <span class="meta-pill">Dificultad: <strong id="currentDifficulty">Fácil</strong></span>
+                <span class="meta-pill"><span data-i18n="difficulty">Difficulty</span>: <strong id="currentDifficulty">Easy</strong></span>
               </div>
-              <div class="num-pad" id="numPad" aria-label="Teclado numérico"></div>
+              <div class="num-pad" id="numPad" aria-label="Number pad" data-i18n-aria="numberPadLabel"></div>
               <div class="pad-actions">
-                <button id="pencilBtn" class="action-btn pill">✎ Lápiz</button>
-                <button id="undoBtn" class="action-btn pill">↶ Deshacer</button>
-                <button id="hintBtn" class="action-btn pill">💡 Pista</button>
-                <button id="restartBtn" class="action-btn pill">↻ Reiniciar</button>
+                <button id="pencilBtn" class="action-btn pill" data-i18n="pencil">✎ Notes</button>
+                <button id="undoBtn" class="action-btn pill" data-i18n="undo">↶ Undo</button>
+                <button id="hintBtn" class="action-btn pill" data-i18n="hint">💡 Hint</button>
+                <button id="restartBtn" class="action-btn pill" data-i18n="restart">↻ Restart</button>
               </div>
-              <div class="mobile-keypad" id="mobileKeypad" aria-label="Teclado táctil"></div>
+              <div class="mobile-keypad" id="mobileKeypad" aria-label="Touch keypad" data-i18n-aria="mobileKeypadLabel"></div>
             </div>
           </div>
         </section>
@@ -79,13 +79,13 @@
     </div>
 
     <footer class="site-footer">
-      <span>Creado por Michael Acosta</span>
-      <nav class="social-links" aria-label="Perfiles de Michael Acosta">
-        <a href="https://github.com/MichaelAcostaDev" target="_blank" rel="noopener noreferrer" aria-label="GitHub de Michael Acosta">
+      <span data-i18n="footerCredit">Created by Michael Acosta</span>
+      <nav class="social-links" aria-label="Michael Acosta's profiles" data-i18n-aria="profilesLabel">
+        <a href="https://github.com/MichaelAcostaDev" target="_blank" rel="noopener noreferrer" aria-label="Michael Acosta on GitHub" data-i18n-aria="githubProfile">
           <i class="fa-brands fa-github" aria-hidden="true"></i>
           <span>GitHub</span>
         </a>
-        <a href="https://www.linkedin.com/in/michael-acosta-dev/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn de Michael Acosta">
+        <a href="https://www.linkedin.com/in/michael-acosta-dev/" target="_blank" rel="noopener noreferrer" aria-label="Michael Acosta on LinkedIn" data-i18n-aria="linkedinProfile">
           <i class="fa-brands fa-linkedin" aria-hidden="true"></i>
           <span>LinkedIn</span>
         </a>
@@ -94,19 +94,19 @@
 
     <div class="overlay hidden" id="pauseOverlay" aria-live="polite">
       <div class="overlay-card pause-card">
-        <p class="eyebrow">Pausa</p>
-        <h2>Juego pausado</h2>
+        <p class="eyebrow" data-i18n="pausedEyebrow">Paused</p>
+        <h2 data-i18n="pausedTitle">Game paused</h2>
         <div class="pause-stats">
-          <div><span>Tiempo</span><strong id="pauseTime">00:00</strong></div>
-          <div><span>Dificultad</span><strong id="pauseDifficulty">Fácil</strong></div>
-          <div><span>Errores</span><strong id="pauseErrors">0 / 5</strong></div>
-          <div><span>Puntuación</span><strong id="pauseScore">1000</strong></div>
+          <div><span data-i18n="time">Time</span><strong id="pauseTime">00:00</strong></div>
+          <div><span data-i18n="difficulty">Difficulty</span><strong id="pauseDifficulty">Easy</strong></div>
+          <div><span data-i18n="errors">Errors</span><strong id="pauseErrors">0 / 5</strong></div>
+          <div><span data-i18n="score">Score</span><strong id="pauseScore">1000</strong></div>
         </div>
         <div class="overlay-actions">
-          <button id="resumeBtn" class="action-btn primary">Continuar</button>
-          <button id="pauseRestartBtn" class="action-btn">Reiniciar</button>
-          <button id="pauseNewGameBtn" class="action-btn">Nueva partida</button>
-          <button id="pauseExitBtn" class="action-btn">Salir</button>
+          <button id="resumeBtn" class="action-btn primary" data-i18n="continue">Continue</button>
+          <button id="pauseRestartBtn" class="action-btn" data-i18n="restart">Restart</button>
+          <button id="pauseNewGameBtn" class="action-btn" data-i18n="newGame">New game</button>
+          <button id="pauseExitBtn" class="action-btn" data-i18n="exit">Exit</button>
         </div>
       </div>
     </div>
@@ -114,56 +114,56 @@
     <div class="overlay hidden" id="tutorialOverlay" aria-live="polite">
       <div class="overlay-card tutorial-card">
         <div class="tutorial-header">
-          <p class="eyebrow">Tutorial guiado</p>
+          <p class="eyebrow" data-i18n="tutorialEyebrow">Guided tutorial</p>
           <div class="progress-dots" id="progressDots"></div>
         </div>
         <div class="tutorial-content">
-          <h2 id="tutorialTitle">¿Qué es Sudoku?</h2>
+          <h2 id="tutorialTitle">What is Sudoku?</h2>
           <p id="tutorialText"></p>
           <div class="tutorial-demo" id="tutorialDemo"></div>
         </div>
         <div class="overlay-actions tutorial-actions">
-          <button id="tutorialPrev" class="action-btn">Anterior</button>
-          <button id="tutorialNext" class="action-btn primary">Siguiente</button>
-          <button id="tutorialSkip" class="action-btn">Saltar</button>
-          <button id="tutorialFinish" class="action-btn primary">Finalizar</button>
+          <button id="tutorialPrev" class="action-btn" data-i18n="previous">Previous</button>
+          <button id="tutorialNext" class="action-btn primary" data-i18n="next">Next</button>
+          <button id="tutorialSkip" class="action-btn" data-i18n="skip">Skip</button>
+          <button id="tutorialFinish" class="action-btn primary" data-i18n="finish">Finish</button>
         </div>
       </div>
     </div>
 
     <div class="overlay hidden" id="continueOverlay" aria-live="polite">
       <div class="overlay-card">
-        <p class="eyebrow">Partida guardada</p>
-        <h2>¿Quieres continuar?</h2>
-        <p>Se ha detectado una partida guardada en este dispositivo.</p>
+        <p class="eyebrow" data-i18n="savedEyebrow">Saved game</p>
+        <h2 data-i18n="continueQuestion">Continue your game?</h2>
+        <p data-i18n="savedGameMessage">A saved game was found on this device.</p>
         <div class="overlay-actions">
-          <button id="continueGameBtn" class="action-btn primary">Continuar partida</button>
-          <button id="newSavedGameBtn" class="action-btn">Nueva partida</button>
+          <button id="continueGameBtn" class="action-btn primary" data-i18n="continueGame">Continue game</button>
+          <button id="newSavedGameBtn" class="action-btn" data-i18n="newGame">New game</button>
         </div>
       </div>
     </div>
 
     <div class="overlay hidden" id="confirmOverlay" aria-live="polite">
       <div class="overlay-card">
-        <p class="eyebrow">Confirmación</p>
-        <h2>¿Deseas comenzar una nueva partida?</h2>
-        <p>Tu progreso actual se perderá si confirmas este cambio.</p>
+        <p class="eyebrow" data-i18n="confirmation">Confirmation</p>
+        <h2 data-i18n="confirmNewGameQuestion">Start a new game?</h2>
+        <p data-i18n="loseProgressMessage">Your current progress will be lost if you continue.</p>
         <div class="overlay-actions">
-          <button id="cancelNewGameBtn" class="action-btn">Cancelar</button>
-          <button id="confirmNewGameBtn" class="action-btn primary">Nueva partida</button>
+          <button id="cancelNewGameBtn" class="action-btn" data-i18n="cancel">Cancel</button>
+          <button id="confirmNewGameBtn" class="action-btn primary" data-i18n="newGame">New game</button>
         </div>
       </div>
     </div>
 
     <div class="overlay hidden" id="resultModal" aria-live="assertive">
       <div class="overlay-card result-card">
-        <p class="eyebrow">Fin de partida</p>
-        <h2 id="resultTitle">¡Sudoku Completado!</h2>
+        <p class="eyebrow" data-i18n="gameOverEyebrow">Game over</p>
+        <h2 id="resultTitle">Sudoku complete!</h2>
         <p id="resultMessage"></p>
         <div class="result-details" id="resultDetails"></div>
         <div class="overlay-actions">
-          <button id="resultNewGameBtn" class="action-btn primary">Nueva partida</button>
-          <button id="resultCloseBtn" class="action-btn">Cerrar</button>
+          <button id="resultNewGameBtn" class="action-btn primary" data-i18n="resultNewGame">New game</button>
+          <button id="resultCloseBtn" class="action-btn" data-i18n="close">Close</button>
         </div>
       </div>
     </div>
