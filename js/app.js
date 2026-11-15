@@ -423,8 +423,10 @@ function renderBoard() {
       const isHighlightRow = selectedRow === row;
       const isHighlightCol = selectedCol === col;
       const isHighlightBox = selectedRow !== null && selectedCol !== null && getBoxIndex(selectedRow, selectedCol) === getBoxIndex(row, col);
+      const isShadedBox = (Math.floor(row / 3) + Math.floor(col / 3)) % 2 === 0;
 
       if (isFixed) cell.classList.add("locked");
+      if (isShadedBox) cell.classList.add("box-shade");
       if (isSelected) cell.classList.add("selected");
       if (isHighlightRow) cell.classList.add("highlight-row");
       if (isHighlightCol) cell.classList.add("highlight-col");
@@ -685,8 +687,18 @@ function generatePuzzle(difficulty) {
 
   shuffleArray(positions);
   let removed = 0;
-  for (const pair of positions) {
-    if (removed >= targetEmpty) break;
+  while (positions.length && removed < targetEmpty) {
+    const boxCounts = Array(9).fill(0);
+    initialBoard.forEach((row, rowIndex) => {
+      row.forEach((value, colIndex) => {
+        if (value !== 0) boxCounts[getBoxIndex(rowIndex, colIndex)] += 1;
+      });
+    });
+    positions.sort((firstPair, secondPair) => {
+      const score = (pair) => pair.reduce((total, cell) => total + boxCounts[getBoxIndex(cell.row, cell.col)], 0);
+      return score(secondPair) - score(firstPair);
+    });
+    const pair = positions.shift();
     const [first, second] = pair;
     const firstValue = initialBoard[first.row][first.col];
     const secondValue = initialBoard[second.row][second.col];
