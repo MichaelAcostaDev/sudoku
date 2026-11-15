@@ -588,7 +588,6 @@ function isValidPlacementAt(row, col, value) {
       if ((r !== row || c !== col) && state.currentBoard[r][c] === value) return false;
     }
   }
-  if (!skipSelf && state.initialBoard[row][col] !== 0 && state.initialBoard[row][col] !== value) return false;
   return true;
 }
 
